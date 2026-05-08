@@ -1029,6 +1029,8 @@ const SENTENCES = {
 
 // ── Practice Logic ────────────────────────────────────────────────────────────
 let currentUtterance = null;
+let currentAudio = null;
+let currentAudio = null;
 let currentNum = null;
 let currentQuestion = 0;
 let completed = [];
@@ -1054,28 +1056,24 @@ function shuffle(arr) {
   return arr;
 }
 
-function speak(text) {
-  if (currentUtterance) speechSynthesis.cancel();
-  currentUtterance = new SpeechSynthesisUtterance(text);
-  currentUtterance.lang = 'en-US';
-  currentUtterance.rate = 0.9;
-  currentUtterance.pitch = 1.0;
-  // Prefer English voice
-  const voices = speechSynthesis.getVoices();
-  const enVoice = voices.find(v => v.lang.startsWith('en-US') && v.default) ||
-                   voices.find(v => v.lang.startsWith('en'));
-  if (enVoice) currentUtterance.voice = enVoice;
-  currentUtterance.onend = () => {
+function speak(num) {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  const audio = new Audio('audio/' + String(num).padStart(4, '0') + '.mp3');
+  currentAudio = audio;
+  audio.onended = () => {
     document.getElementById('waveform').classList.add('paused');
     document.getElementById('play-btn').textContent = '▶ 播放';
   };
-  currentUtterance.onerror = () => {
+  audio.onerror = () => {
     document.getElementById('play-btn').textContent = '▶ 播放';
     document.getElementById('waveform').classList.add('paused');
   };
   document.getElementById('waveform').classList.remove('paused');
   document.getElementById('play-btn').textContent = '⏸ 播放中...';
-  speechSynthesis.speak(currentUtterance);
+  audio.play();
 }
 
 function stopSpeaking() {
@@ -1086,16 +1084,16 @@ function stopSpeaking() {
 }
 
 function togglePlay() {
-  if (speechSynthesis.speaking && !speechSynthesis.paused) {
-    speechSynthesis.pause();
+  if (currentAudio && !currentAudio.paused) {
+    currentAudio.pause();
     document.getElementById('play-btn').textContent = '▶ 播放';
     document.getElementById('waveform').classList.add('paused');
-  } else if (speechSynthesis.paused) {
-    speechSynthesis.resume();
+  } else if (currentAudio && currentAudio.paused) {
+    currentAudio.play();
     document.getElementById('play-btn').textContent = '⏸ 播放中...';
     document.getElementById('waveform').classList.remove('paused');
   } else {
-    speak(SENTENCES[currentNum] || '');
+    speak(currentNum);
   }
 }
 
