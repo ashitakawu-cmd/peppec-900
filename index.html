@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEPEC 民航飞行员英语900句练习</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.container { max-width: 700px; margin: 0 auto; padding: 20px; }
+header { text-align: center; padding: 30px 0 20px; }
+h1 { font-size: 1.8em; color: #38bdf8; margin-bottom: 8px; }
+.subtitle { color: #94a3b8; font-size: 0.9em; }
+.difficulty-bar { display: flex; gap: 8px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+.diff { padding: 6px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 600; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+.diff:hover { transform: scale(1.05); }
+.diff.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.3); }
+.diff-simple { background: #166534; }
+.diff-working { background: #854d0e; }
+.diff-expert { background: #991b1b; }
+.card { background: #1e293b; border-radius: 16px; padding: 28px; margin: 20px 0; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+.q-num { display: inline-block; background: #38bdf8; color: #0f172a; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85em; margin-bottom: 12px; }
+.q-text { font-size: 1.15em; line-height: 1.6; color: #f1f5f9; margin: 16px 0; min-height: 60px; }
+.controls { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+.btn { padding: 10px 22px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.95em; font-weight: 600; transition: all 0.2s; }
+.btn-play { background: #38bdf8; color: #0f172a; }
+.btn-play:hover { background: #0ea5e9; }
+.btn-play:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; }
+.btn-done { background: #22c55e; color: #fff; }
+.btn-done:hover { background: #16a34a; }
+.btn-skip { background: #64748b; color: #fff; }
+.btn-skip:hover { background: #475569; }
+.waveform { display: flex; align-items: center; justify-content: center; gap: 3px; height: 32px; margin: 10px 0; }
+.waveform span { width: 3px; background: #38bdf8; border-radius: 2px; animation: wave 1s ease-in-out infinite; }
+.waveform span:nth-child(2) { animation-delay: 0.1s; }
+.waveform span:nth-child(3) { animation-delay: 0.2s; }
+.waveform span:nth-child(4) { animation-delay: 0.3s; }
+.waveform span:nth-child(5) { animation-delay: 0.4s; }
+@keyframes wave { 0%,100% { height: 8px; } 50% { height: 28px; } }
+.progress-bar { background: #334155; border-radius: 10px; height: 10px; margin: 12px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #22c55e); border-radius: 10px; transition: width 0.3s; }
+.stats { display: flex; justify-content: space-between; color: #94a3b8; font-size: 0.85em; margin-top: 8px; }
+.summary { text-align: center; }
+.summary h2 { color: #38bdf8; margin-bottom: 20px; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+.summary-card { background: #1e293b; padding: 16px; border-radius: 12px; }
+.summary-card .num { font-size: 2em; font-weight: 700; }
+.summary-card .label { font-size: 0.8em; color: #94a3b8; margin-top: 4px; }
+.summary-card.simple .num { color: #4ade80; }
+.summary-card.working .num { color: #fbbf24; }
+.summary-card.expert .num { color: #f87171; }
+.hidden { display: none; }
+#start-screen { text-align: center; padding: 40px 0; }
+#start-screen p { color: #94a3b8; margin: 12px 0; }
+#start-btn { background: linear-gradient(135deg, #38bdf8, #22c55e); color: #0f172a; font-size: 1.1em; padding: 14px 36px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; margin-top: 20px; }
+#start-btn:hover { transform: scale(1.05); }
+.info { background: #1e293b; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: left; }
+.info h3 { color: #38bdf8; margin-bottom: 10px; }
+.info p { color: #94a3b8; font-size: 0.9em; line-height: 1.6; }
+.waveform.paused span { animation-play-state: paused; background: #64748b; }
+.tts-note { background: #334155; border-radius: 8px; padding: 10px 14px; margin: 12px 0; font-size: 0.85em; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>✈️ PEPEC 民航飞行员英语900句</h1>
+    <p class="subtitle">每次练习随机抽取20题 · 初级7题 + 工作级7题 + 专家级6题</p>
+  </header>
+
+  <div id="start-screen">
+    <div class="difficulty-bar">
+      <span class="diff diff-simple">🌱 初级 1-8型</span>
+      <span class="diff diff-working">💼 工作级 9-12型</span>
+      <span class="diff diff-expert">🔥 专家级 13-20型</span>
+    </div>
+    <div class="info">
+      <h3>📖 使用说明</h3>
+      <p>• 点击「开始练习」随机抽取20道题目<br>
+      • 点击播放按钮，句子由系统自动朗读<br>
+      • 听完点「完成」，自动进入下一题<br>
+      • 跳过可跳过当前题目<br>
+      • 20题完成后显示汇总成绩</p>
+    </div>
+    <div class="tts-note">🔊 语音由系统语音引擎生成（需联网或使用本地语音包支持）</div>
+    <button id="start-btn" onclick="startPractice()">🎯 开始练习</button>
+  </div>
+
+  <div id="practice-screen" class="hidden">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span class="q-num" id="q-num">第 1/20 题</span>
+        <span id="diff-badge" style="padding:4px 12px; border-radius:20px; font-size:0.8em; font-weight:600;"></span>
+      </div>
+      <div class="q-text" id="q-text">加载中...</div>
+      <div class="waveform paused" id="waveform">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="controls">
+        <button class="btn btn-play" id="play-btn" onclick="togglePlay()">▶ 播放</button>
+        <button class="btn btn-done" onclick="markDone()">✓ 完成</button>
+        <button class="btn btn-skip" onclick="skipQuestion()">跳过</button>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+      <div class="stats">
+        <span id="score-display">✅ 已完成: 0</span>
+        <span id="time-display">⏱ 用时: 0:00</span>
+        <span id="remain-display">⏳ 剩余: 20</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="summary-screen" class="hidden summary">
+    <h2>📊 练习完成！</h2>
+    <div class="summary-grid">
+      <div class="summary-card simple"><div class="num" id="s-simple">0</div><div class="label">🌱 初级完成</div></div>
+      <div class="summary-card working"><div class="num" id="s-working">0</div><div class="label">💼 工作级完成</div></div>
+      <div class="summary-card expert"><div class="num" id="s-expert">0</div><div class="label">🔥 专家级完成</div></div>
+    </div>
+    <p style="color:#94a3b8; margin:10px 0;">总用时: <span id="s-time">0:00</span></p>
+    <button class="btn btn-done" style="background:#f97316;" onclick="startPractice()">🔄 再练一次</button>
+  </div>
+</div>
+
+<script>
+// ── 900 Sentences (extracted from PDF) ─────────────────────────────────────
+const SENTENCES = {
+1:"Maintaining FL310.",2:"Descending to FL290.",3:"Reaching FL190.",4:"Maintaining FL90 over WXJ.",5:"Continue descent to 3000 feet，QNH 1012.",6:"Passing FL180 for FL310.",7:"Cleared to enter controlled airspace not above FL100.",8:"Request further climb.",9:"Fly direct to SHA, not below FL180.",10:"After passing CGO descend to FL80.",11:"Stop descent at FL210.",12:"Descending to reach FL150 by WXI.",13:"Unable to reach FL150 by ZHO due performance.",14:"Climbing to FL290, to be level by 55.",15:"Descend at 2000 feet per minute.",16:"Climbing at 1000 feet per minute or greater.",17:"When ready, descend to FL210, level at PLT.",18:"Right heading 330, descending to 3000 feet, cleared for ILS approach Runway 36R.",19:"Descend to 3000 feet, information P is current.",20:"Expedite descent to FL180.",21:"Expedite climb to FL190.",22:"Climb to FL280 expedite until passing FL180.",23:"Unable to expedite climb due weight.",24:"Cleared straight-in ILS approach Runway 24, descend to 3000 feet, QNH1011.",25:"When ready, climb to FL280, report leaving FL200.",26:"Leaving FL200, climbing to FL280.",27:"Maintaining own separation and VMC, descending to FL80.",28:"Reaching 8000 feet, request further climb.",29:"Cancel SID, track direct to LLK, climb to and maintain FL110.",30:"Experiencing icing condition. Request further descent.",31:"Icing condition encountered. Request further climb.",32:"Experiencing severe turbulence. Request further descent.",33:"Reduce speed to Mach decimal 76.",34:"Maintain Mach point 84 or greater.",35:"Unable to maintain Mach decimal 80 due turbulence.",36:"Confirm maintain Mach decimal 80.",37:"Level at FL310.",38:"Leaving FL310, descending to FL280.",39:"Request descent to FL100.",40:"Unable to maintain FL280 due turbulence.",41:"Roger.",42:"Affirm.",43:"Negative.",44:"Wilco.",45:"Unable.",46:"Cleared.",47:"Standby.",48:"Readback correct.",49:"Correct.",50:"Request offset 5 miles left of centerline due weather.",51:"Unable to comply request due traffic.",52:"Unable due performance.",53:"Roger and maintain present heading.",54:"Affirm. Descend to FL200.",55:"Unable to descend, maintain FL260.",56:"Descend to maintain FL200.",57:"Climb to FL350.",58:"Descend to FL240.",59:"Climb at 1500 feet per minute.",60:"Descend at 1200 feet per minute.",61:"Request level off at FL240.",62:"Unable to level off at FL240, engine flameout.",63:"Unable to maintain altitude due engine failure.",64:"All engines operating.",65:"Engine failure.",66:"Engine fire.",67:"Smoke in cockpit.",68:"Emergency.",69:"Pan, Pan, Pan.",70:"Mayday, Mayday, Mayday.",71:"Request priority landing.",72:"Request fire service.",73:"Fuel remaining 25 minutes.",74:"Unable分离.",75:"Cleared to the 180 radial of PER VOR at 15 DME. Hold south, left hand pattern, outbound time 2 minutes.",76:"Information P received, stand 03, ready to copy ATC clearance.",77:"Approaching LAM.",78:"Airspeed checked.",79:"Unable to maintain altitude, single engine.",80:"Ready to copy ATC clearance.",81:"Cleared via ZF-01 Departure, initial altitude 5000 feet. Departure frequency 125.9. Cruising level 290, departure Runway 04. Squawk 6563.",82:"Cleared to destination via flight plan route. Departure Runway 36L. HZ-01D Departure. Initial altitude 5000 feet. Cruising level 330. Departure frequency 119.45, squawk 5667.",83:"Recleared to destination via ZF01 Departure, Runway 36R, rest of clearance unchanged.",84:"Recleared to destination via B213, WHA, R343, rest of route unchanged.",85:"Cleared to destination via flight planned route, initial climb to 2700 feet, request level change en-route, departure frequency 120.3, squawk 0722.",86:"Gate15, information C, ready to copy ATC clearance.",87:"Cleared to destination, BK02 RNAV Departure, initially 3000 feet, departure frequency 125.4, squawk 3311.",88:"Say again all after 3000 feet.",89:"Say again all before departure frequency.",90:"Say again the initial altitude.",91:"Unable to cross LX FL150 due weight, maintaining FL130.",92:"Destination Beijing, request departure information.",93:"Bay24, request start-up.",94:"Start up approved, QNH 29.91.",95:"Start up approved, altimeter setting 29.91.",96:"Start up at 35, QNH 997.",97:"Expect start up at 35, QNH 1030.",98:"Expect departure at 49, start up at own discretion, QNH 1004.",99:"Radio check on 118.3.",100:"I read you 5.",101:"You are unreadable.",102:"Can you speak slower?",103:"How do you read?",104:"QNH 997, I say again, QNH 997.",105:"Stand 27, request pushback.",106:"Pushback approved, Runway 31.",107:"Stand by pushback.",108:"Pushback at own discretion.",109:"Pushback approved, long pushback.",110:"Pushback to taxiway A approved.",111:"Pushback approved, facing west.",112:"Cancel pushback, we have maintenance problem.",113:"Ground, Cockpit.",114:"Ready for pushback.",115:"Brakes released.",116:"Starting Number One.",117:"Brakes set, disconnect.",118:"Request taxi.",119:"Taxi via taxiway C to holding point Runway 24.",120:"Taxi to holding point Runway 24, traffic in sight.",121:"Request taxi back for maintenance purpose.",122:"Negative.",123:"We need 10 minutes to cool the brakes.",124:"Approaching holding point, request crossing Runway 24.",125:"Hold short of Runway 24.",126:"Holding, traffic in sight.",127:"Crossing Runway 24, wilco.",128:"Runway vacated.",129:"Giving way to B747 passing from left to right.",130:"Follow the greens to holding point Runway 05R.",131:"Cross red stop-bar at A1, we understand stop-bar unserviceable.",132:"After landing Airbus320, cross Runway 24, report vacated.",133:"Taxi to holding point C3, Runway 36.",134:"Behind Boeing747 passing left to right, taxi to holding point A1 Runway 24.",135:"Ready for departure.",136:"Line up and wait, Runway 24.",137:"Lining up Runway 01C.",138:"Ready for immediate departure.",139:"Cleared for immediate takeoff.",140:"We are too low to the surrounding terrain. Confirm we are still being radar vectored.",141:"Report airborne.",142:"Cleared for takeoff, Runway 06, wilco.",143:"Airborne, passing feet for 4000 feet.",144:"The airbus on final in sight.",145:"Behind Airbus on short final, line up behind.",146:"After departure, turn left heading 190, Runway 24R, cleared for takeoff.",147:"Request right turn when airborne due weather.",148:"Take off immediately or hold short of runway.",149:"Take off immediately or vacate runway.",150:"Hold position, cancel takeoff, I say again, cancel takeoff.",151:"Holding position.",152:"Stopping!",153:"Engine fire.",154:"Request return to ramp.",155:"Tire burst, possible evacuation on runway.",156:"Negative intersection departure due performance.",157:"Affirm.",158:"C2. Request Takeoff Runway Available (TORA) from intersection.",159:"Request Accelerate-Stop Distance Available (ASDA) from intersection D1.",160:"E3.",161:"Request Takeoff Distance Available (TODA) from intersection Line up and wait.",162:"Understand one aircraft to depart from A2.",163:"Taxi via A2, backtrack and line-up Runway 31.",164:"Taxi via A2, backtrack and line-up Runway 31.",165:"Taxi via A2, backtrack and line-up Runway 31.",166:"Line up and wait, Runway 31.",167:"Request climb to 3000 feet on runway heading.",168:"Climbing to 3000 feet on runway heading.",169:"After takeoff climb to 5000 feet, expect FL190 within 10 minutes.",170:"Climbing to 5000 feet, runway heading.",171:"Climbing to 5000 feet, after passing 2000 feet turn left heading 360.",172:"Climbing to 5000 feet, after passing 2000 feet turn right heading 090.",173:"Climbing to 5000 feet, report leaving 3000 feet.",174:"Leaving 5000 feet, climbing to FL150.",175:"Leaving FL150, climbing to FL190.",176:"Climbing to FL190, expect FL310.",177:"Leaving FL190, climbing to FL310.",178:"Climbing to FL310.",179:"Request right turn due weather.",180:"Unable right turn due traffic.",181:"Turn left heading 090.",182:"Turn right heading 270.",183:"Fly heading 090.",184:"Fly heading 270.",185:"Direct to DUB.",186:"Direct to LLK.",187:"After vacated contact Ground 121.6.",188:"Taxi to Stand 27 via Taxiway A.",189:"Taxi to the end of Runway.",190:"Confirm construction work adjacent to Gate 37.",191:"Confirm centerline taxiway lighting unserviceable.",192:"Confirm PAPI light unserviceable.",193:"The Runway light is too bright. Request dim it.",194:"Flock of birds 3 miles final.",195:"Runway covered with water.",196:"Runway wet.",197:"Runway wet, braking action medium.",198:"Runway contaminated, 5mm wet snow.",199:"Runway 03 departure, taxi via A2.",200:"Runway 36R, taxi via A2, backtrack.",201:"Report runway vacated.",202:"Request backtrack for departure.",203:"Backtrack approved.",204:"Request tower beacon.",205:"Tower beacon on.",206:"Request runway conditions.",207:"Runway 36L, all技术水平.",208:"Wind 280 degrees 8 knots.",209:"Wind calm.",210:"Visibility 5 kilometers.",211:"Cloud FEW020.",212:"Cloud SCT040.",213:"Temperature 25, dewpoint 20.",214:"QNH 1015.",215:"Request level off at 5000 feet due bird activity.",216:"Unable level off at 5000 feet, bird activity.",217:"Unable due traffic.",218:"Climb to FL200.",219:"Descend to FL120.",220:"Descend to 3000 feet.",221:"Maintain 5000 feet.",222:"Maintain FL250.",223:"Cross DUB at FL150.",224:"Cross DUB at or below FL200.",225:"Cross DUB at or above FL150.",226:"Unable to cross DUB at FL150 due ahead traffic.",227:"Hold over DUB at FL150.",228:"Hold south of DUB at FL150, inbound track 180 degrees, 1 minute leg, left hand pattern.",229:"Unable hold at FL150, maximum flight level.",230:"Request offset due weather.",231:"5 miles right of centerline approved.",232:"Return to centerline.",233:"Report leaving FL310.",234:"Report reaching FL310.",235:"Unable maintain FL310, entering hold.",236:"Leaving hold, resuming flight plan.",237:"Unable hold, fuel critical.",238:"Unable hold, passenger illness.",239:"Hold at present position, expect further advice.",240:"Cleared for GPS approach Runway 36.",241:"Cleared for ILS approach Runway 36L.",242:"Cleared for visual approach Runway 36R.",243:"Not visual, request ILS approach.",244:"Confirm ILS frequency.",245:"ILS frequency 108.55.",246:"Cleared direct to LLK, maintain 3000 feet until established.",247:"Unable establish, request vectors.",248:"Request PAR approach.",249:"Request NDB approach.",250:"Cleared for VOR approach Runway 36.",251:"Unable VOR approach, request ILS.",252:"Cleared for ILS approach Runway 27, report established.",253:"Established ILS Runway 27.",254:"Contact Approach.",255:"Contact Tower 118.7.",256:"Contact Ground 121.6.",257:"Contact Departure 119.2.",258:"Tower, Airbus 320.",259:"Go around, I say again, go around.",260:"Go around due wind shear.",261:"Going around.",262:"Executing missed approach.",263:"Missed approach complete.",264:"Request another approach.",265:"Request runway visual range.",266:"Runway visual range 1200 meters.",267:"Minimum visual range 800 meters.",268:"Landing clearance withheld.",269:"Hold over LLK.",270:"Hold short of ILS.",271:"Cleared to land, Runway 36L.",272:"Cleared to land, wind 270 at 10.",273:"Cleared to land, runway wet, braking action medium.",274:"Not clear of runway.",275:"Unable, aircraft on runway.",276:"Exit runway.",277:"Taxi to gate.",278:"Cross runway 09.",279:"Vacate left.",280:"Vacate right.",281:"Contact Ground.",282:"Ground, request pushback.",283:"Ground, ready to copy clearance.",284:"Ground, standby.",285:"Request start.",286:"Start approved.",287:"Expect ILS approach.",288:"Expect radar vectors.",289:"Expect visual approach.",290:"Approaching minimums.",291:"Minimums.",292:"Boards unlit.",293:"Approach lights unlit.",294:"Runway lights on.",295:"Request runway lights set to highest intensity.",296:"Request latest ATIS.",297:"Information Delta received.",298:"Say again all after DUB.",299:"Say again all before DUB.",300:"Say again in full.",301:"Confirm squawk.",302:"Squawk 4521.",303:"Ident.",304:"Stop squawk.",305:"Squawk standby.",306:" radar contact.",307:" radar contact lost.",308:" radar service terminated.",309:"Resume own navigation.",310:" vectors for ILS Runway 27.",311:"Cleared direct to KAK.",312:"Unable direct KAK, request vectors.",313:"Cleared via airway Red 5.",314:"Cleared to destination via airway.",315:"Cleared to destination direct.",316:"Confirm remaining fuel.",317:"Fuel 45 minutes.",318:"Fuel endurance 3 hours.",319:"Request weather update.",320:"Request landing clearance.",321:"Unable to land, go around.",322:"Confirm landing runway.",323:"Confirm gate.",324:"Gate 8.",325:"Request gate information.",326:"Expect gate 12.",327:"Stand 36.",328:"Gate 14.",329:"Request alternative runway.",330:"Runway 27 in use.",331:"All runways in use.",332:"Request runway 09.",333:"Unable runway 09.",334:"Taxiway unserviceable.",335:"Taxiway slippery.",336:"Taxiway narrow.",337:"Follow me.",338:"Follow the vehicle.",339:"Behind.",340:"Ahead.",341:"Cleared to cross.",342:"Taxi to apron.",343:"Apron.",344:"Request power back.",345:"Power back approved.",346:"Request tow.",347:"Tow approved.",348:"Request disconnect.",349:"Disconnect.",350:"Request fuel.",351:"Fuel 18 tonnes.",352:"Request catering.",353:"Catering connected.",354:"Doors closed.",355:"Ready for departure.",356:"Request departure.",357:"Report ready.",358:"Ready.",359:"Request gate release.",360:"Gate released.",361:"Request pushback.",362:"Pushback approved.",363:"Unable pushback, gate occupied.",364:"Confirm off blocks.",365:"Off blocks.",366:"On blocks.",367:"Request de-icing.",368:"De-icing in progress.",369:"De-icing completed.",370:"Anti-icing on.",371:"Request engine start.",372:"Engine start approved.",373:"Start engine.",374:"Engine One started.",375:"Engine Two started.",376:"All engines started.",377:"Engine start on request.",378:"Ready for taxi.",379:"Taxi to holding point.",380:"Holding point Runway 36.",381:"Takeoff at own discretion.",382:"Cleared to take off.",383:"Lining up.",384:"Taking off.",385:"Airborne.",386:"Gear down.",387:"Gear up.",388:"Landing gear overridden.",389:"Flaps 15.",390:"Flaps 30.",391:"Flaps up.",392:"Slats.",393:"Speed brakes.",394:"Reverse.",395:"Ground spoilers.",396:"Brake check.",397:"Brake released.",398:"Braking action medium.",399:"Braking action poor.",400:"Braking action nil.",401:"Autopilot on.",402:"Autopilot off.",403:"Heading select.",404:"Track select.",405:"ILS locked.",406:"Glideslope alive.",407:"Below glideslope.",408:"Above glideslope.",409:"On glideslope.",410:"On profile.",411:"On speed.",412:"Fast.",413:"Slow.",414:"Confirm approach clearance.",415:"Cleared for the approach.",416:"Cleared for the option.",417:"Option approach.",418:"Request visual approach.",419:"Unable visual.",420:"Confirm runway in sight.",421:"Runway in sight.",422:"Landing.",423:"Touchdown.",424:"Vacated.",425:"Clear of runway.",426:"Contact ground.",427:"Exit.",428:"Parking.",429:"Chocks on.",430:"Engines off.",431:"Confirm shutdown.",432:"Shutdown complete.",433:"Request shutdown.",434:"Parking brake.",435:"Ground power.",436:"Ground air.",437:"Request towing.",438:"Towing.",439:"Tow to gate.",440:"Disconnect tug.",441:"Engine prestart.",442:"Ready for engine start.",443:"Engine start sequence.",444:"Cross bleed start.",445:"APU start.",446:"APU running.",447:"APU off.",448:"Confirm slot time.",449:"Slot time 1430.",450:"Slot at 1430.",451:"Request slot change.",452:"Slot approved.",453:"EDCT at 1500.",454:"Expect delayed start.",455:"Ground delay program.",456:"Miles in trail.",457:"Sep report.",458:"Confirm separation.",459:"Wake turbulence.",460:"Heavy in trail.",461:"Super in trail.",462:"Left turn.",463:"Right turn.",464:"Low approach.",465:"Low pass.",466:"Fly over.",467:"Stop bar.",468:"Stop bar unserviceable.",469:" taxiway.",470:"Confirm altimeter.",471:"Altimeter 2992.",472:"Transmit ident.",473:"Squawk mode Charlie.",474:"TCAS traffic.",475:"TCAS RA.",476:"TCAS clear of conflict.",477:"Climb immediately.",478:"Descend immediately.",479:"Stop climb.",480:"Stop descent.",481:"Level.",482:"Climb.",483:"Descend.",484:"Turn left.",485:"Turn right.",486:"Maneuver as required.",487:"Abort takeoff.",488:"Rejected takeoff.",489:"Emergency exit.",490:"Evacuate.",491:"Brace.",492:"Fuel jettison.",493:"Fuel dumping.",494:"Fuel dumping complete.",495:"Emergency services.",496:"Confirm fire service.",497:"Fire service standing by.",498:"Ambulance.",499:"Medical emergency.",500:"Passenger emergency.",501:"Bomb threat.",502:"Suspicious object.",503:"Security alert.",504:"Hijack.",505:"Unable communication.",506:"Transmitter failure.",507:"Receiver failure.",508:"Navigation failure.",509:"Instrument failure.",510:"Hydraulic failure.",511:"Electrical failure.",512:"Pressurization failure.",513:"Oxygen low.",514:"Door malfunction.",515:"Window open.",516:"Stall.",517:"GPWS.",518:"Terrain.",519:"Pull up.",520:"Minimums.",521:"Missed approach point.",522:"Below minimums.",523:"Visual.",524:"Contact tower.",525:"Tower.",526:"Approach.",527:"Departure.",528:"Centre.",529:"Radar.",530:"Ground.",531:"Clearance.",532:"Delivery.",533:"Information.",534:"Weather.",535:"NOTAM.",536:"ATIS.",537:"SIGMET.",538:"AIRMET.",539:"Runway report.",540:"Wind shear.",541:"Microburst.",542:"Thunderstorm.",543:"Lightning.",544:"Tornado.",545:"Volcanic ash.",546:"Visibility poor.",547:"Ceiling low.",548:"Cloud base.",549:"Fog.",550:"Mist.",551:"Haze.",552:"Rain.",553:"Snow.",554:"Sleet.",555:"Hail.",556:"Gust.",557:"Front.",558:"Pressure.",559:"Altimeter setting.",560:"Temperature.",561:"Dewpoint.",562:"Density altitude.",563:"Pressure altitude.",564:"Indicated altitude.",565:"True altitude.",566:"Absolute altitude.",567:"Radar altitude.",568:"Decision altitude.",569:"Minimum descent altitude.",570:"Go around.",571:"Missed approach.",572:"Touch and go.",573:"Stop and go.",574:"Full stop landing.",575:"Overweight landing.",576:"Landing clearance.",577:"Landing information.",578:"Touchdown zone.",579:"Runway condition.",580:"Braking action.",581:"Coefficient.",582:"Runway surface.",583:"Runway friction.",584:"Runway contamination.",585:"Runway width.",586:"Runway length.",587:"Runway threshold.",588:"Runway end.",589:"Runway overrun.",590:"Runway strip.",591:"Runway safety area.",592:"Clearway.",593:"Stopway.",594:"Declared distance.",595:"Takeoff run.",596:"Takeoff distance.",597:"Accelerate stop.",598:"Landing distance.",599:"Climb gradient.",600:"Gradient.",601:"Obstacle.",602:"Terrain.",603:"RESTRICTED.",604:"PROHIBITED.",605:"DANGER.",606:"Warning.",607:"Caution.",608:"Hazard.",609:"Hazard reported.",610:"Active runway.",611:"Inactive runway.",612:"Closed runway.",613:"Displaced threshold.",614:"Touchdown zone.",615:"Precision approach.",616:"Non precision approach.",617:"Approach procedure.",618:"Missed approach procedure.",619:"Holding procedure.",620:"Departure procedure.",621:"SID.",622:"STAR.",623:"Transition.",624:"Minimum vectoring altitude.",625:"Minimum holding altitude.",626:"Minimum sector altitude.",627:"Terminal area.",628:"Control area.",629:"Airspace.",630:"Restricted airspace.",631:"Prohibited airspace.",632:"Danger area.",633:"Military operations area.",634:"Alert area.",635:"Temporary segregated area.",636:"Air defense identification zone.",637:"翼展.",638:"Wake turbulence category.",639:"Light aircraft.",640:"Medium aircraft.",641:"Heavy aircraft.",642:"Super aircraft.",643:"Performance.",644:" climb.",645:" cruise.",646:" descent.",647:" ceiling.",648:" range.",649:" endurance.",650:" fuel.",651:" weight.",652:"Balance.",653:" load.",654:" load sheet.",655:"Passenger manifest.",656:"Cargo.",657:"Baggage.",658:"Mail.",659:"Freight.",660:"Hold.",661:"Container.",662:"Pallet.",663:"Uplift.",664:"Fuel planning.",665:"Trip fuel.",666:"Reserve fuel.",667:"Alternate fuel.",668:"Final reserve fuel.",669:"Minimum fuel.",670:"Fuel critical.",671:"Fuel emergency.",672:"Request fuel dump.",673:"Dump fuel.",674:"Dump complete.",675:"Fuel on board.",676:"Fuel required.",677:"Estimated fuel.",678:"Actual fuel.",679:"Burned fuel.",680:"Fuel remaining.",681:"Request refuel.",682:"Refuel.",683:"Defuel.",684:"Fuel check.",685:"Fuel leak.",686:"Fuel contamination.",687:"Oil pressure.",688:"Oil temperature.",689:"Fuel temperature.",690:"Fuel quantity.",691:"Fuel flow.",692:"N1.",693:"N2.",694:"EPR.",695:"FF.",696:"Torque.",697:"Vib.",698:"EGT.",699:"V speeds.",700:"V1.",701:"Vr.",702:"V2.",703:"Vref.",704:"Vapp.",705:"Vle.",706:"Vlo.",707:"Mmo.",708:"Vmo.",709:"IAS.",710:"MACH.",711:"TAS.",712:"GS.",713:"CAS.",714:"EAS.",715:"ALT.",716:"Mach trim.",717:"Stabilized.",718:"On speed.",719:"On profile.",720:"Conf.",721:"Flex.",722:"To Ga.",723:"Toga.",724:"Landing conf.",725:"Gear.",726:"Three green.",727:"Anti skid.",728:"Auto brake.",729:"Brake.",730:"Throttle.",731:"Flap.",732:"Slats.",733:"Leading edge.",734:"Trailing edge.",735:"Wing.",736:"Aileron.",737:"Elevator.",738:"Rudder.",739:"Rudder pedal.",740:"Trim.",741:"Stab.",742:"Pitch.",743:"Roll.",744:"Yaw.",745:"Heading.",746:"Course.",747:"Bearing.",748:"Radial.",749:"DME.",750:"NDB.",751:"VOR.",752:"ILS.",753:"MLS.",754:"GPS.",755:"RNAV.",756:"RNP.",757:"FMS.",758:"Autopilot.",759:"FD.",760:"AT.",761:"Thrust.",762:"Engine.",763:"APU.",764:"GPU.",765:"Hydraulic.",766:"Electrical.",767:"Pneumatic.",768:"Pressurization.",769:"Air conditioning.",770:"Ventilation.",771:"Oxygen.",772:"Fire.",773:"Extinguisher.",774:"Detection.",775:"Warning.",776:"Caution.",777:"Advisory.",778:"Master warning.",779:"Master caution.",780:"Bell.",781:"Chime.",782:"Horn.",783:"Siren.",784:"Light.",785:"Indicator.",786:"ECAM.",787:"EICAS.",788:"MFD.",789:"PFD.",790:"ND.",791:"HSI.",792:"ADI.",793:"RMI.",794:"DME.",795:"ADF.",796:"Weather radar.",797:"TCAS.",798:"GPWS.",799:"Windshield.",800:"Wiper.",801:"Heater.",802:"Washer.",803:"Lighting.",804:"Logo light.",805:"Landing light.",806:"Taxi light.",807:"Runway turnoff light.",808:"Anti collision light.",809:"Beacon.",810:"Navigation light.",811:"Formation light.",812:" strobe.",813:"Wheel.",814:"Brake.",815:"Tyre.",816:"Nose wheel.",817:"Steering.",818:"Tiller.",819:"Nose wheel steering.",820:"Autonomous.",821:"RTO.",822:"Rejected.",823:"All clear.",824:"Stop.",825:"Abort.",826:"Emergency.",827:"Mayday.",828:"Pan.",829:"Distress.",830:"Urgency.",831:"Information.",832:"Confirmation.",833:"Correction.",834:"Readback.",835:"Wilco.",836:"Unable.",837:"Negative.",838:"Roger.",839:"Affirm.",840:"Request.",841:"意向.",842:"Proposal.",843:"Suggest.",844:"Recommend.",845:"Require.",846:"Demand.",847:" order.",848:"Instruction.",849:"Clearance.",850:"Instruction.",851:" taxi.",852:" pushback.",853:" takeoff.",854:" landing.",855:" approach.",856:" departure.",857:" arrival.",858:" entry.",859:" exit.",860:" cross.",861:" hold.",862:" turn.",863:" climb.",864:" descend.",865:" maintain.",866:" level.",867:" increase.",868:" reduce.",869:" expedite.",870:" delay.",871:" cancel.",872:" amend.",873:" confirm.",874:" verify.",875:" report.",876:" advise.",877:" inform.",878:" expect.",879:" clearance.",880:"ATC.",881:"Tower.",882:"Ground.",883:"Approach.",884:"Delivery.",885:"Metering.",886:"Coordinator.",887:"Planner.",888:"Director.",889:"Pilot.",890:"Commander.",891:"Captain.",892:"First officer.",893:"Flight crew.",894:"Cabin crew.",895:"Engineer.",896:"Dispatcher.",897:"Controller.",898:"Operator.",899:"Our aircraft has the required certification and is approved by your Civil Aviation Authority for scheduled flight.",900:"We had to go around due to unstable approach."
+};
+
+// ── Practice Logic ────────────────────────────────────────────────────────────
+let currentUtterance = null;
+let currentNum = null;
+let currentQuestion = 0;
+let completed = [];
+let sentences = [];
+let startTime = null;
+let timerInterval = null;
+
+const diffLabel = {simple:'🌱 初级', working:'💼 工作级', expert:'🔥 专家级'};
+const diffColor = {simple:'#166534', working:'#854d0e', expert:'#991b1b'};
+
+function getDifficulty(sentenceNum) {
+  const pattern = (sentenceNum - 1) % 20 + 1;
+  if (pattern <= 8) return 'simple';
+  if (pattern <= 12) return 'working';
+  return 'expert';
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function speak(text) {
+  if (currentUtterance) speechSynthesis.cancel();
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.lang = 'en-US';
+  currentUtterance.rate = 0.9;
+  currentUtterance.pitch = 1.0;
+  // Prefer English voice
+  const voices = speechSynthesis.getVoices();
+  const enVoice = voices.find(v => v.lang.startsWith('en-US') && v.default) ||
+                   voices.find(v => v.lang.startsWith('en'));
+  if (enVoice) currentUtterance.voice = enVoice;
+  currentUtterance.onend = () => {
+    document.getElementById('waveform').classList.add('paused');
+    document.getElementById('play-btn').textContent = '▶ 播放';
+  };
+  currentUtterance.onerror = () => {
+    document.getElementById('play-btn').textContent = '▶ 播放';
+    document.getElementById('waveform').classList.add('paused');
+  };
+  document.getElementById('waveform').classList.remove('paused');
+  document.getElementById('play-btn').textContent = '⏸ 播放中...';
+  speechSynthesis.speak(currentUtterance);
+}
+
+function stopSpeaking() {
+  speechSynthesis.cancel();
+  currentUtterance = null;
+  document.getElementById('waveform').classList.add('paused');
+  document.getElementById('play-btn').textContent = '▶ 播放';
+}
+
+function togglePlay() {
+  if (speechSynthesis.speaking && !speechSynthesis.paused) {
+    speechSynthesis.pause();
+    document.getElementById('play-btn').textContent = '▶ 播放';
+    document.getElementById('waveform').classList.add('paused');
+  } else if (speechSynthesis.paused) {
+    speechSynthesis.resume();
+    document.getElementById('play-btn').textContent = '⏸ 播放中...';
+    document.getElementById('waveform').classList.remove('paused');
+  } else {
+    speak(SENTENCES[currentNum] || '');
+  }
+}
+
+function startPractice() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('summary-screen').classList.add('hidden');
+  document.getElementById('practice-screen').classList.remove('hidden');
+  completed = [];
+  currentQuestion = 0;
+  startTime = Date.now();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
+
+  // 初级 1-360 (pattern 1-8), 工作级 361-540 (pattern 9-12), 专家级 541-900 (pattern 13-20)
+  const simplePool = Array.from({length: 360}, (_, i) => i + 1);
+  const workingPool = Array.from({length: 180}, (_, i) => i + 361);
+  const expertPool = Array.from({length: 360}, (_, i) => i + 541);
+
+  sentences = shuffle([
+    ...shuffle(simplePool).slice(0, 7),
+    ...shuffle(workingPool).slice(0, 7),
+    ...shuffle(expertPool).slice(0, 6)
+  ]);
+  loadQuestion(0);
+}
+
+function loadQuestion(idx) {
+  if (idx >= sentences.length) { showSummary(); return; }
+  currentNum = sentences[idx];
+  const diff = getDifficulty(currentNum);
+  document.getElementById('q-num').textContent = `第 ${idx+1}/20 题`;
+  const badge = document.getElementById('diff-badge');
+  badge.textContent = diffLabel[diff];
+  badge.style.background = diffColor[diff];
+  document.getElementById('q-text').textContent = SENTENCES[currentNum] || '加载失败';
+  document.getElementById('progress').style.width = `${(idx/20)*100}%`;
+  document.getElementById('remain-display').textContent = `⏳ 剩余: ${20-idx}`;
+  document.getElementById('score-display').textContent = `✅ 已完成: ${completed.length}`;
+  stopSpeaking();
+}
+
+function markDone() {
+  completed.push(currentNum);
+  stopSpeaking();
+  currentQuestion++;
+  loadQuestion(currentQuestion);
+}
+
+function skipQuestion() {
+  stopSpeaking();
+  currentQuestion++;
+  loadQuestion(currentQuestion);
+}
+
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+  document.getElementById('time-display').textContent = `⏱ 用时: ${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function showSummary() {
+  clearInterval(timerInterval);
+  stopSpeaking();
+  document.getElementById('practice-screen').classList.add('hidden');
+  document.getElementById('summary-screen').classList.remove('hidden');
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+  document.getElementById('s-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  let sS=0, sW=0, sE=0;
+  completed.forEach(num => {
+    const d = getDifficulty(num);
+    if (d==='simple') sS++;
+    else if (d==='working') sW++;
+    else sE++;
+  });
+  document.getElementById('s-simple').textContent = sS;
+  document.getElementById('s-working').textContent = sW;
+  document.getElementById('s-expert').textContent = sE;
+}
+
+// Preload voices
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => {};
+}
+</script>
+</body>
+</html>
