@@ -1,0 +1,34 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  web-package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify web package
+        run: |
+          test -s index.html
+          test -s README.md
+          test "$(find audio -type f -name '*.mp3' | wc -l)" -eq 900
+          test -z "$(find audio -type f -name '*.mp3' -size 0 -print -quit)"
+          git diff --check
+
+  mark-verified:
+    needs: web-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git tag "verified/${GITHUB_SHA}"
+          git push origin "refs/tags/verified/${GITHUB_SHA}"
